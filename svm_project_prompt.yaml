@@ -1,0 +1,402 @@
+# Master YAML Prompt for Antigravity Agent
+# Project: SVM Kernel Trick 3D Interactive Demonstration
+# Goal: Implement a complete 3-phase Support Vector Machine visualization project.
+
+meta:
+  prompt_name: "SVM Kernel Trick 3D Interactive Demo"
+  version: "2.0.0"
+  language: "zh-TW"
+  target_workspace: "HW8"
+  role_instruction: >
+    You are an expert Python visualization engineer. Build a complete SVM
+    educational demonstration with Manim animations, true Scikit-Learn SVM
+    decision-surface computation, and an interactive Streamlit/Plotly dashboard.
+  primary_goal: >
+    Create a visually polished and mathematically correct project that explains
+    how nonlinear 2D data, such as a blue center cluster surrounded by a red
+    outer ring, can be separated by SVM kernels and visualized in 3D.
+
+global_requirements:
+  output_language:
+    ui_text: "English with concise Traditional Chinese explanations where helpful"
+    code_comments: "English"
+    readme: "English and Traditional Chinese mixed explanations are acceptable"
+  visual_style:
+    name: "Modern dark glassmorphism"
+    background: "#090B10"
+    surface: "rgba(255,255,255,0.075)"
+    border: "rgba(255,255,255,0.16)"
+    text_primary: "#F8FAFC"
+    text_secondary: "#AAB4C5"
+    blue_core: "#38BDF8"
+    red_outer_ring: "#F43F5E"
+    hyperplane: "#F8FAFC"
+    margin: "#A78BFA"
+    support_vector: "#F59E0B"
+    accent: "#6366F1"
+  critical_color_and_label_rule:
+    requirement: "For concentric-circle data, blue points must be in the center and red points must be on the outer ring."
+    sklearn_warning: >
+      sklearn.datasets.make_circles returns y=0 for the outer circle and y=1
+      for the inner circle. The implementation must remap labels so that
+      y=0 means blue center/core and y=1 means red outer ring.
+    required_test: >
+      Add a test verifying that the mean radius of y=0 points is smaller than
+      the mean radius of y=1 points.
+  mathematical_correctness:
+    - "Use Scikit-Learn SVC for the true classifier."
+    - "Use model.decision_function on a dense mesh to compute the true 2D decision surface."
+    - "Do not fake the decision boundary by drawing only a hand-written circle."
+    - "Use the 3D lift as an educational visualization, and clearly state that the true RBF feature space is implicit/high-dimensional."
+    - "Support vectors must be extracted from the trained SVC and plotted in original feature coordinates."
+
+project_structure:
+  root_files:
+    - path: "README.md"
+      purpose: "Project overview, installation, run commands, concept explanation, troubleshooting."
+    - path: "requirements.txt"
+      purpose: "Dependencies for Streamlit, Plotly, Scikit-Learn, tests."
+    - path: "requirements-manim.txt"
+      purpose: "Separate Manim dependency to avoid blocking dashboard installation."
+    - path: ".streamlit/config.toml"
+      purpose: "Dark Streamlit theme configuration."
+  directories:
+    - path: "src/"
+      files:
+        - "src/__init__.py"
+        - "src/data.py"
+        - "src/svm_engine.py"
+        - "src/metrics.py"
+        - "src/plotting.py"
+        - "src/theme.py"
+    - path: "app/"
+      files:
+        - "app/streamlit_app.py"
+    - path: "animations/"
+      files:
+        - "animations/svm_manim.py"
+    - path: "tests/"
+      files:
+        - "tests/test_svm_engine.py"
+
+dependencies:
+  dashboard_and_core:
+    - "numpy>=1.26"
+    - "pandas>=2.1"
+    - "scikit-learn>=1.4"
+    - "plotly>=5.20"
+    - "streamlit>=1.34"
+    - "pytest>=8.0"
+  manim:
+    - "manim>=0.18"
+  note: >
+    Keep Manim in requirements-manim.txt. On some Windows/Python versions,
+    Manim OpenGL dependencies may require Microsoft C++ Build Tools.
+
+phase_1_manim_concept_animation:
+  title: "Phase 1 - Manim Concept Animation"
+  goal: >
+    Create cinematic Manim scenes that explain SVM geometry, support vectors,
+    maximum margin, and the kernel trick from 2D to 3D.
+  output_file: "animations/svm_manim.py"
+  required_scenes:
+    - class_name: "LinearSVMMarginScene"
+      purpose: "Explain linear SVM, candidate separating lines, maximum margin, and support vectors."
+      storyboard:
+        - "Draw a 2D coordinate grid with two linearly separable classes."
+        - "Show several candidate separating lines."
+        - "Replace them with the optimal hyperplane w^T x + b = 0."
+        - "Draw margin lines w^T x + b = +1 and w^T x + b = -1."
+        - "Highlight support vectors with amber rings."
+        - "Display margin = 2 / ||w|| and the maximize-margin intuition."
+      required_equations:
+        - "w^T x + b = 0"
+        - "w^T x_i + b = +/- 1"
+        - "margin = 2 / ||w||"
+    - class_name: "KernelTrick3DScene"
+      purpose: "Explain how blue-center/red-ring data becomes separable after a 3D kernel-style lift."
+      storyboard:
+        - "Show 2D concentric circles: blue points in the center and red points on the outer ring."
+        - "Show that a straight 2D line cannot separate the classes."
+        - "Lift points into 3D using z = exp(-gamma * (x^2 + y^2)) or z = x^2 + y^2 for didactic comparison."
+        - "Use camera rotation to reveal blue center points and red outer-ring points at different heights."
+        - "Draw a translucent separating hyperplane in lifted space."
+        - "Project back to 2D and show the nonlinear circular decision boundary."
+      required_equations:
+        - "K(x_i, x) = exp(-gamma * ||x_i - x||^2)"
+        - "z = exp(-gamma * (x^2 + y^2))"
+      visual_rules:
+        - "Blue center points must remain visually in the center before lifting."
+        - "Red outer-ring points must remain visually on the outside before lifting."
+        - "After RBF-style lift, center points should appear higher than outer-ring points."
+        - "The hyperplane should be semi-transparent and clearly visible."
+  render_commands:
+    preview_linear: "manim -pql animations/svm_manim.py LinearSVMMarginScene"
+    preview_kernel: "manim -pql animations/svm_manim.py KernelTrick3DScene"
+    high_quality_kernel: "manim -pqh animations/svm_manim.py KernelTrick3DScene"
+
+phase_2_sklearn_decision_engine:
+  title: "Phase 2 - True Scikit-Learn SVM Decision Surface"
+  goal: >
+    Implement reusable Python modules that generate datasets, train true SVM
+    models, compute dense decision surfaces, extract support vectors, and
+    evaluate model performance.
+  files:
+    data_py:
+      path: "src/data.py"
+      requirements:
+        - "Implement generate_dataset(dataset, n_samples, noise, random_state)."
+        - "Support circles, moons, linear, and xor datasets."
+        - "Return a typed or dataclass bundle with X, y, label, and description."
+        - "For circles, remap make_circles labels so y=0 is blue center and y=1 is red outer ring."
+    svm_engine_py:
+      path: "src/svm_engine.py"
+      requirements:
+        - "Implement train_svm with StandardScaler + sklearn.svm.SVC pipeline."
+        - "Support kernels: rbf, linear, poly, sigmoid."
+        - "Support hyperparameters: C, gamma, degree, test_size, random_state."
+        - "Extract support_vectors_ and inverse_transform them back to original feature coordinates."
+        - "Implement compute_decision_mesh using model.decision_function over np.meshgrid."
+        - "Implement kernel_lift_z for educational 3D coordinates."
+    metrics_py:
+      path: "src/metrics.py"
+      requirements:
+        - "Compute accuracy, precision, recall, F1, confusion matrix, ROC curve, and AUC."
+        - "Use decision_function scores for ROC."
+        - "Use zero_division=0 for precision and recall."
+    plotting_py:
+      path: "src/plotting.py"
+      requirements:
+        - "Build Plotly 2D decision contour figure."
+        - "Build Plotly 3D kernel lift figure."
+        - "Build confusion matrix and ROC figures."
+  dataset_details:
+    circles:
+      generator: "sklearn.datasets.make_circles"
+      default_factor: 0.42
+      default_noise: 0.15
+      label_mapping:
+        y_0: "blue center/core"
+        y_1: "red outer ring"
+      validation: "mean_radius(y=0) < mean_radius(y=1)"
+    moons:
+      generator: "sklearn.datasets.make_moons"
+    linear:
+      generator: "sklearn.datasets.make_classification"
+      parameters:
+        n_features: 2
+        n_redundant: 0
+        n_informative: 2
+        n_clusters_per_class: 1
+        class_sep: 1.8
+    xor:
+      generator: "custom numpy generator"
+      rule: "y = 1 if x * y > 0 else 0, with Gaussian noise"
+  model_defaults:
+    kernel: "rbf"
+    C: 1.0
+    gamma: 1.0
+    degree: 3
+    test_size: 0.3
+    random_state: 42
+    mesh_resolution: 260
+  true_decision_function:
+    formula: "f(x) = sum_i alpha_i y_i K(x_i, x) + b"
+    rbf_kernel: "K(x_i, x) = exp(-gamma * ||x_i - x||^2)"
+    contour_rules:
+      decision_boundary: "z = 0"
+      margins: "z = -1 and z = +1"
+      support_vectors: "hollow amber markers"
+  educational_3d_lift:
+    note: "This is for visualization; the true RBF SVM feature space is implicit."
+    formulas:
+      rbf: "z = exp(-gamma * (x^2 + y^2))"
+      linear: "z = x + y"
+      poly: "z = (gamma * (x + y) + coef0)^degree"
+      sigmoid: "z = tanh(gamma * (x + y) + coef0)"
+
+phase_3_streamlit_plotly_dashboard:
+  title: "Phase 3 - Streamlit and Plotly Interactive Dashboard"
+  goal: >
+    Build a polished interactive dashboard where users tune SVM parameters and
+    immediately inspect the 2D decision boundary, 3D kernel lift, support
+    vectors, and model diagnostics.
+  entrypoint: "app/streamlit_app.py"
+  run_command: "streamlit run app/streamlit_app.py"
+  page_config:
+    page_title: "SVM Interactive Arena"
+    page_icon: "SVM"
+    layout: "wide"
+    initial_sidebar_state: "expanded"
+  sidebar_controls:
+    - id: "dataset"
+      label: "Dataset Geometry"
+      type: "selectbox"
+      options:
+        - "Blue Core / Red Ring"
+        - "Interlocking Moons"
+        - "Linear Separable"
+        - "XOR Quadrants"
+    - id: "kernel"
+      label: "Kernel Function"
+      type: "selectbox"
+      options:
+        - "RBF Gaussian"
+        - "Linear"
+        - "Polynomial"
+        - "Sigmoid"
+    - id: "n_samples"
+      label: "Samples"
+      type: "slider"
+      min: 100
+      max: 1000
+      default: 400
+      step: 50
+    - id: "noise"
+      label: "Noise"
+      type: "slider"
+      min: 0.0
+      max: 0.5
+      default: 0.15
+      step: 0.01
+    - id: "C"
+      label: "Regularization C"
+      type: "slider_or_log_slider"
+      min: 0.01
+      max: 100.0
+      default: 1.0
+    - id: "gamma"
+      label: "Gamma"
+      type: "slider_or_log_slider"
+      min: 0.01
+      max: 10.0
+      default: 1.0
+      visible_when: "kernel in ['RBF Gaussian', 'Polynomial', 'Sigmoid']"
+    - id: "degree"
+      label: "Polynomial Degree"
+      type: "slider"
+      min: 2
+      max: 6
+      default: 3
+      visible_when: "kernel == 'Polynomial'"
+    - id: "mesh_resolution"
+      label: "Mesh Resolution"
+      type: "slider"
+      min: 120
+      max: 420
+      default: 260
+      step: 20
+    - id: "random_state"
+      label: "Random Seed"
+      type: "number_input"
+      default: 42
+  main_tabs:
+    - id: "decision_space"
+      label: "2D Decision Space"
+      requirements:
+        - "Show a Plotly contour based on true SVM decision_function values."
+        - "Draw z=0 as the main decision boundary."
+        - "Draw z=-1 and z=+1 as margin contours."
+        - "Plot blue center/core and red outer-ring data points."
+        - "Highlight support vectors with hollow amber outlines."
+        - "Use hover text for x, y, class, and decision score."
+    - id: "kernel_lift"
+      label: "3D Kernel Lift"
+      requirements:
+        - "Show a rotatable Plotly 3D figure."
+        - "Plot lifted data points with class colors."
+        - "Show an educational lifted surface or decision trace."
+        - "Use a dark scene background and readable grid."
+        - "For RBF lift, center points should have larger z values than outer ring points."
+    - id: "model_diagnostics"
+      label: "Model Diagnostics"
+      requirements:
+        - "Show accuracy, precision, recall, F1, and support vector count."
+        - "Show confusion matrix as Plotly heatmap."
+        - "Show ROC curve with AUC and baseline diagonal."
+    - id: "concept_notes"
+      label: "Concept Notes"
+      requirements:
+        - "Explain C, gamma, support vectors, and RBF kernel concisely."
+        - "State that the 3D lift is educational and the true RBF feature space is implicit."
+  streamlit_style_requirements:
+    - "Inject custom CSS for glassmorphism panels."
+    - "Use dark theme and transparent Plotly backgrounds."
+    - "Avoid a marketing landing page; the first screen must be the usable dashboard."
+    - "Keep layout responsive and avoid overlapping text."
+    - "Use concise labels and high contrast."
+
+testing_and_validation:
+  required_commands:
+    - "python -m compileall src app animations"
+    - "python -m pytest -q"
+    - "streamlit run app/streamlit_app.py"
+  required_tests:
+    - name: "dataset_generation_shape"
+      expectation: "X has shape (n_samples, 2), y has shape (n_samples,)."
+    - name: "circles_label_mapping_matches_visual_story"
+      expectation: "For circles, mean radius of y=0 blue center points is smaller than y=1 red outer-ring points."
+    - name: "svm_training_support_vectors"
+      expectation: "Support vector count is greater than 0 and no larger than n_samples."
+    - name: "decision_mesh_shape"
+      expectation: "xx, yy, zz, and predictions all have shape (resolution, resolution)."
+    - name: "metrics_are_valid"
+      expectation: "accuracy, precision, recall, F1, and AUC are all in [0, 1]."
+    - name: "rbf_circles_reasonable_accuracy"
+      expectation: "Default RBF SVM on circles should reach accuracy above 0.8."
+  manual_visual_checks:
+    - "In 2D circles, blue points are in the center and red points are outside."
+    - "In 3D RBF lift, blue center points are higher than red outer-ring points."
+    - "The decision boundary is not a static hand-drawn circle; it follows SVC.decision_function."
+    - "Support vectors are visibly highlighted."
+
+readme_requirements:
+  sections:
+    - "Project Overview"
+    - "Installation"
+    - "Run Streamlit Dashboard"
+    - "Render Manim Animations"
+    - "Project Structure"
+    - "SVM Concepts"
+    - "Validation"
+    - "Troubleshooting"
+  commands_to_include:
+    - "python -m pip install -r requirements.txt"
+    - "python -m pip install -r requirements-manim.txt"
+    - "streamlit run app/streamlit_app.py"
+    - "manim -pql animations/svm_manim.py LinearSVMMarginScene"
+    - "manim -pql animations/svm_manim.py KernelTrick3DScene"
+
+agent_workflow:
+  implementation_order:
+    - "Create project structure and dependency files."
+    - "Implement src/data.py with correct circle label mapping."
+    - "Implement src/svm_engine.py with true SVC training and decision mesh."
+    - "Implement src/metrics.py."
+    - "Implement src/plotting.py."
+    - "Implement app/streamlit_app.py."
+    - "Implement animations/svm_manim.py."
+    - "Write README.md."
+    - "Write tests."
+    - "Run compileall, pytest, and optionally launch Streamlit."
+  final_response_must_include:
+    - "Summary of files created or modified."
+    - "How to run the dashboard."
+    - "How to render Manim scenes."
+    - "Validation results."
+    - "Known limitations, especially Manim installation issues if any."
+
+acceptance_criteria:
+  minimum:
+    - "Dashboard runs with Streamlit."
+    - "2D decision boundary uses true Scikit-Learn decision_function."
+    - "Blue center / red outer-ring mapping is correct."
+    - "3D Plotly lift is rotatable and visually coherent."
+    - "Support vectors are highlighted."
+    - "Manim file includes linear margin and kernel trick scenes."
+    - "Tests pass."
+  excellent:
+    - "The UI feels polished, dark, modern, and glassmorphic."
+    - "Plotly hover labels are useful and clean."
+    - "The README lets a new user run the dashboard quickly."
+    - "The project clearly distinguishes educational 3D lift from true implicit RBF SVM math."
