@@ -2,6 +2,15 @@
 
 HW8 is a complete Support Vector Machine teaching project. It shows how nonlinear 2D data, such as a blue center cluster surrounded by red outer samples, can be handled with SVM kernels and visualized through 2D/3D decision-space diagrams.
 
+The Streamlit app is organized in a multi-page teaching style inspired by `ChenYuHsu413/L13-SVM`:
+
+- Landing page
+- SVM Concept
+- Margin and Support Vectors
+- Interactive SVM
+- Kernel Trick
+- Quiz
+
 The project includes three phases:
 
 1. **Phase 1 - Manim concept animation**
@@ -89,6 +98,12 @@ manim -pqh animations/svm_manim.py KernelTrick3DScene
 HW8/
   app/
     streamlit_app.py
+  pages/
+    1_SVM_Concept.py
+    2_Margin_and_Support_Vectors.py
+    3_Interactive_SVM.py
+    4_Kernel_Trick.py
+    5_Quiz.py
   animations/
     svm_manim.py
   src/
