@@ -1,191 +1,127 @@
-# SVM Kernel Trick 3D Interactive Demo
+# HW8 - SVM Kernel Trick 3D Interactive Demo
 
-HW8 is a complete Support Vector Machine teaching project. It shows how nonlinear 2D data, such as a blue center cluster surrounded by red outer samples, can be handled with SVM kernels and visualized through 2D/3D decision-space diagrams.
+This project is a three-phase teaching demo for Support Vector Machine concepts:
 
-The Streamlit app is organized in a multi-page teaching style inspired by `ChenYuHsu413/L13-SVM`:
+1. Manim concept animations for SVM margin and kernel trick intuition.
+2. Scikit-Learn SVM training with true RBF decision function visualization.
+3. Streamlit + Plotly interactive teaching website ready for Streamlit Community Cloud.
 
-- Landing page
-- SVM Concept
-- Margin and Support Vectors
-- Interactive SVM
-- Kernel Trick
-- Quiz
+## Project Structure
 
-The project includes three phases:
+```text
+.
+├── animations/                  # Manim scenes
+├── app/streamlit_app.py          # Main full interactive app implementation
+├── pages/                        # Streamlit multipage lessons
+├── scripts/export_phase2.py      # Generates Phase 2 HTML/metrics outputs
+├── src/                          # Dataset, SVM engine, metrics, plotting, theme
+├── tests/                        # Validation tests
+├── outputs/                      # Rendered videos, HTML plots, metrics
+├── streamlit_app.py              # Streamlit Cloud entrypoint
+├── phase1_manim_kernel_trick.py  # Manim compatibility entrypoint
+├── requirements.txt              # Streamlit Cloud dependencies
+└── requirements-manim.txt        # Local Manim-only dependency
+```
 
-1. **Phase 1 - Manim concept animation**
-   Explains maximum margin, support vectors, and the kernel trick.
-2. **Phase 2 - Scikit-Learn SVM engine**
-   Trains a real `sklearn.svm.SVC` model and computes the true decision surface with `decision_function`.
-3. **Phase 3 - Streamlit/Plotly dashboard**
-   Provides an interactive dark glassmorphism UI for tuning dataset, kernel, `C`, `gamma`, and `degree`.
-
-## Installation
-
-Install the dashboard and core ML dependencies:
+## Run Locally
 
 ```powershell
 python -m pip install -r requirements.txt
+streamlit run streamlit_app.py
 ```
 
-Install Manim separately:
-
-```powershell
-python -m pip install -r requirements-manim.txt
-```
-
-Manim is best installed with Python 3.10-3.12. On Python 3.14, some Manim dependencies such as `moderngl` and `glcontext` may require Microsoft C++ Build Tools.
-
-## Run The Dashboard
-
-```powershell
-streamlit run app/streamlit_app.py
-```
-
-Or use the helper script:
-
-```powershell
-.\run_dashboard.ps1
-```
-
-Then open:
+Local URL:
 
 ```text
 http://localhost:8501
 ```
 
-For Streamlit Cloud or simple deployment, use the root entrypoint:
-
-```powershell
-streamlit run streamlit_app.py
-```
-
-## Dashboard Features
-
-- Dataset selection: Blue Core / Red Ring, Moons, Linear, XOR
-- Kernel selection: RBF Gaussian, Linear, Polynomial, Sigmoid
-- Hyperparameter controls: `C`, `gamma`, `degree`, mesh resolution, random seed
-- 2D Plotly decision contour from true `SVC.decision_function`
-- 3D Plotly kernel lift visualization
-- Support vectors highlighted with amber outlines
-- Model diagnostics: accuracy, precision, recall, F1, confusion matrix, ROC/AUC
-
-## Render Manim Animations
-
-Preview quality:
-
-```powershell
-manim -pql animations/svm_manim.py LinearSVMMarginScene
-manim -pql animations/svm_manim.py KernelTrick3DScene
-```
-
-Root convenience entrypoint:
-
-```powershell
-manim -pql phase1_manim_kernel_trick.py LinearSVMMarginScene
-manim -pql phase1_manim_kernel_trick.py KernelTrick3DScene
-```
-
-Higher quality:
-
-```powershell
-manim -pqh animations/svm_manim.py KernelTrick3DScene
-```
-
-## Project Structure
-
-```text
-HW8/
-  app/
-    streamlit_app.py
-  pages/
-    1_SVM_Concept.py
-    2_Margin_and_Support_Vectors.py
-    3_Interactive_SVM.py
-    4_Kernel_Trick.py
-    5_Quiz.py
-  animations/
-    svm_manim.py
-  src/
-    data.py
-    metrics.py
-    plotting.py
-    svm_engine.py
-    theme.py
-  tests/
-    test_svm_engine.py
-  .streamlit/
-    config.toml
-  image_hyperplane_random_points_final.png
-  requirements.txt
-  requirements-manim.txt
-  svm_project_prompt.yaml
-```
-
-## Important Math Note
-
-The 3D lift shown in the dashboard and Manim scene is an educational visualization:
-
-```text
-z = exp(-gamma * (x^2 + y^2))
-```
-
-The true RBF SVM does not explicitly map data to a simple 3D surface. Its decision function is:
-
-```text
-f(x) = sum_i alpha_i y_i K(x_i, x) + b
-```
-
-with:
-
-```text
-K(x_i, x) = exp(-gamma * ||x_i - x||^2)
-```
-
-The 2D decision boundary in this project is computed from the trained Scikit-Learn model, not hand-drawn.
-
-## Validation
-
-Run:
-
-```powershell
-.\validate_hw8.ps1
-```
-
-Or manually:
-
-```powershell
-python -m compileall src app animations
-python -m pytest -q
-```
-
-Current expected result:
-
-```text
-6 passed
-```
-
-## Run All Three Phases
-
-Run the full HW8 phase workflow:
+## Run All Phases Locally
 
 ```powershell
 .\run_all_phases.ps1
 ```
 
-This generates:
+This renders Manim videos, exports Scikit-Learn decision-surface artifacts, and checks the Streamlit app.
+
+## Phase 1 - Manim Animation
+
+Generated outputs:
 
 ```text
-outputs/phase_completion_report.md
 outputs/phase1_LinearSVMMarginScene.mp4
 outputs/phase1_KernelTrick3DScene.mp4
+```
+
+Manual render command:
+
+```powershell
+python -m pip install -r requirements-manim.txt
+manim -qh animations/svm_manim.py LinearSVMMarginScene
+manim -qh animations/svm_manim.py KernelTrick3DScene
+```
+
+## Phase 2 - Scikit-Learn True Decision Surface
+
+```powershell
+python scripts/export_phase2.py
+```
+
+Generated outputs:
+
+```text
 outputs/phase2_decision_boundary.html
 outputs/phase2_kernel_lift_3d.html
 outputs/phase2_metrics.json
 ```
 
-Phase 1 Manim rendering requires a working Manim installation. If Manim cannot be installed on Python 3.14 because of `moderngl` / `glcontext`, the script records that environment blocker and still completes Phase 2, Phase 3, and validation.
+The SVM engine uses `sklearn.svm.SVC`, `decision_function`, and support vectors from the fitted model.
 
-## OpenCode Note
+## Phase 3 - Streamlit / Plotly Teaching Site
 
-If Antigravity/OpenCode reports `Unauthorized`, check [OPENCODE_FIX.md](OPENCODE_FIX.md). If it reports `Insufficient Balance`, the API key is valid but the DeepSeek account has no available quota.
+The Streamlit app includes:
+
+- concept pages with Manim video playback
+- margin and support-vector lesson
+- interactive SVM controls for `kernel`, `C`, `gamma`, `degree`, sample count, noise, and seed
+- 2D decision boundary visualization
+- 3D kernel-lift visualization
+- short learning quiz
+
+## Deploy To Streamlit Community Cloud
+
+The repository is ready for deployment. Use these settings in Streamlit Cloud:
+
+```text
+Repository: machinejameswang/HW8
+Branch: main
+Main file path: streamlit_app.py
+Python version: 3.11 recommended
+```
+
+Steps:
+
+1. Go to <https://share.streamlit.io/>.
+2. Sign in with the GitHub account that can access `machinejameswang/HW8`.
+3. Click `Create app` or `New app`.
+4. Choose `Deploy a public app from GitHub`.
+5. Fill in the repository, branch, and main file path shown above.
+6. Click `Deploy`.
+
+No API keys or secrets are required for this HW8 app.
+
+## Validation
+
+```powershell
+python -m pytest -q
+```
+
+Expected result:
+
+```text
+6 passed
+```
+
+## Notes
+
+Manim is intentionally excluded from `requirements.txt` because Streamlit Cloud only needs to serve the generated videos and interactive app. Local Manim rendering uses `requirements-manim.txt`.
