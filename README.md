@@ -45,6 +45,12 @@ Then open:
 http://localhost:8501
 ```
 
+For Streamlit Cloud or simple deployment, use the root entrypoint:
+
+```powershell
+streamlit run streamlit_app.py
+```
+
 ## Dashboard Features
 
 - Dataset selection: Blue Core / Red Ring, Moons, Linear, XOR
@@ -62,6 +68,13 @@ Preview quality:
 ```powershell
 manim -pql animations/svm_manim.py LinearSVMMarginScene
 manim -pql animations/svm_manim.py KernelTrick3DScene
+```
+
+Root convenience entrypoint:
+
+```powershell
+manim -pql phase1_manim_kernel_trick.py LinearSVMMarginScene
+manim -pql phase1_manim_kernel_trick.py KernelTrick3DScene
 ```
 
 Higher quality:

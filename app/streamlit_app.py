@@ -75,7 +75,7 @@ def cached_training(
 def render_sidebar() -> dict:
     """Render controls and return selected configuration."""
     st.sidebar.title("SVM Control Panel")
-    st.sidebar.caption("調整資料、kernel 與 margin 參數，觀察決策面如何改變。")
+    st.sidebar.caption("Tune the dataset, kernel, and margin parameters to inspect SVM geometry.")
 
     dataset_label = st.sidebar.selectbox("Dataset Geometry", list(DATASET_OPTIONS), index=0)
     kernel_label = st.sidebar.selectbox("Kernel Function", list(KERNEL_OPTIONS), index=0)
@@ -129,22 +129,41 @@ def concept_notes(config: dict) -> None:
         <div class="glass-panel">
         <h3>Kernel intuition</h3>
         <p>
-        你現在選的是 <strong>{config["kernel_label"]}</strong>。SVM 的決策函數不是單純手畫曲線，
-        而是由 support vectors 決定：
+        Current kernel: <strong>{config["kernel_label"]}</strong>. The SVM decision function
+        is determined by support vectors:
         </p>
         <pre>f(x) = sum_i alpha_i y_i K(x_i, x) + b</pre>
-        <p>
-        RBF Gaussian kernel 會用距離衡量相似度：
-        </p>
+        <p>The RBF Gaussian kernel measures similarity with distance:</p>
         <pre>K(x_i, x) = exp(-gamma * ||x_i - x||^2)</pre>
         <p>
-        <strong>C</strong> 控制 margin violation 的懲罰，<strong>gamma</strong> 控制 RBF 影響範圍。
-        gamma 越大，邊界越局部、越容易彎曲；C 越大，模型越努力修正訓練錯誤。
+        <strong>C</strong> controls the penalty for margin violations.
+        <strong>gamma</strong> controls how local the RBF influence is.
+        Larger gamma values create more flexible local boundaries.
+        </p>
+        <p>
+        The 3D lift is an educational visualization. The true RBF feature space is
+        implicit and can be high-dimensional or infinite-dimensional.
         </p>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+
+def render_animation_tab() -> None:
+    """Render generated Manim animation videos when available."""
+    animation_files = [
+        ("Linear SVM Margin", ROOT / "outputs" / "phase1_LinearSVMMarginScene.mp4"),
+        ("Kernel Trick 3D", ROOT / "outputs" / "phase1_KernelTrick3DScene.mp4"),
+    ]
+    cols = st.columns(2)
+    for col, (title, path) in zip(cols, animation_files):
+        with col:
+            st.subheader(title)
+            if path.exists():
+                st.video(str(path))
+            else:
+                st.info("Animation not found. Run `./run_all_phases.ps1` to render Phase 1.")
 
 
 def main() -> None:
@@ -187,8 +206,8 @@ def main() -> None:
 
     metric_row(metrics, len(trained.support_vectors))
 
-    tab_decision, tab_lift, tab_metrics, tab_notes = st.tabs(
-        ["2D Decision Space", "3D Kernel Lift", "Model Diagnostics", "Concept Notes"]
+    tab_decision, tab_lift, tab_animation, tab_metrics, tab_notes = st.tabs(
+        ["2D Decision Space", "3D Kernel Lift", "Manim Animations", "Model Diagnostics", "Concept Notes"]
     )
 
     with tab_decision:
@@ -198,6 +217,9 @@ def main() -> None:
     with tab_lift:
         fig = kernel_lift_figure(dataset.X, dataset.y, trained, mesh)
         st.plotly_chart(fig, use_container_width=True)
+
+    with tab_animation:
+        render_animation_tab()
 
     with tab_metrics:
         col_a, col_b = st.columns(2)
