@@ -38,7 +38,7 @@ with left:
 with right:
     st.subheader("Concept animation")
     video = ROOT / "outputs" / "phase1_LinearSVMMarginScene.mp4"
-    if video.exists():
+    if video.exists() and video.stat().st_size > 0:
         st.video(str(video))
     else:
         st.info("Run `./run_all_phases.ps1` to generate the Manim video.")

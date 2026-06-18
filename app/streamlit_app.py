@@ -160,7 +160,7 @@ def render_animation_tab() -> None:
     for col, (title, path) in zip(cols, animation_files):
         with col:
             st.subheader(title)
-            if path.exists():
+            if path.exists() and path.stat().st_size > 0:
                 st.video(str(path))
             else:
                 st.info("Animation not found. Run `./run_all_phases.ps1` to render Phase 1.")

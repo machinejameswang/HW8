@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 from src.theme import streamlit_css
 
@@ -53,6 +54,8 @@ with col_b:
         unsafe_allow_html=True,
     )
     st.info("Use the sidebar page navigation to move through the lesson.")
+    st.page_link("pages/1_SVM_Concept.py", label="Start Concept Lesson")
+    st.page_link("pages/3_Interactive_SVM.py", label="Open Interactive SVM Lab")
 
 st.divider()
 st.subheader("Phase Outputs")
@@ -61,13 +64,30 @@ cards = st.columns(3)
 with cards[0]:
     st.markdown("### Phase 1")
     st.caption("Manim concept animations")
-    if (ROOT / "outputs" / "phase1_KernelTrick3DScene.mp4").exists():
-        st.video(str(ROOT / "outputs" / "phase1_KernelTrick3DScene.mp4"))
+    linear_video = ROOT / "outputs" / "phase1_LinearSVMMarginScene.mp4"
+    kernel_video = ROOT / "outputs" / "phase1_KernelTrick3DScene.mp4"
+    if linear_video.exists() and linear_video.stat().st_size > 0:
+        st.video(str(linear_video))
+    else:
+        st.warning("Linear margin animation is missing. Run `./run_all_phases.ps1`.")
+    if kernel_video.exists() and kernel_video.stat().st_size > 0:
+        st.video(str(kernel_video))
+    else:
+        st.warning("Kernel trick animation is missing. Run `./run_all_phases.ps1`.")
 with cards[1]:
     st.markdown("### Phase 2")
     st.caption("True Scikit-Learn SVM decision surface")
-    st.link_button("Open 2D Decision Boundary", "outputs/phase2_decision_boundary.html")
+    decision_html = ROOT / "outputs" / "phase2_decision_boundary.html"
+    if decision_html.exists() and decision_html.stat().st_size > 0:
+        components.html(decision_html.read_text(encoding="utf-8"), height=460, scrolling=True)
+    else:
+        st.warning("Decision-boundary HTML is missing. Run `python scripts/export_phase2.py`.")
 with cards[2]:
     st.markdown("### Phase 3")
     st.caption("Interactive Streamlit/Plotly dashboard")
-    st.link_button("Go to Interactive Page", "/Interactive_SVM")
+    lift_html = ROOT / "outputs" / "phase2_kernel_lift_3d.html"
+    if lift_html.exists() and lift_html.stat().st_size > 0:
+        components.html(lift_html.read_text(encoding="utf-8"), height=460, scrolling=True)
+    else:
+        st.warning("3D kernel-lift HTML is missing. Run `python scripts/export_phase2.py`.")
+    st.page_link("pages/3_Interactive_SVM.py", label="Go to Interactive Page")

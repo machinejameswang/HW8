@@ -29,8 +29,10 @@ st.markdown(
 )
 
 video = ROOT / "outputs" / "phase1_KernelTrick3DScene.mp4"
-if video.exists():
+if video.exists() and video.stat().st_size > 0:
     st.video(str(video))
+else:
+    st.info("Kernel trick animation is not available yet. The interactive SVM plots below still use the live Scikit-Learn model.")
 
 st.divider()
 st.subheader("Compare kernels on blue-core / red-ring data")

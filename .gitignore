@@ -1,9 +1,15 @@
 __pycache__/
+*.pyc
 *.py[cod]
+*.log
 .pytest_cache/
 .streamlit/secrets.toml
 .venv/
 venv/
+.deps/
 media/
 videos/
-*.log
+vs_BuildTools.exe
+OPENCODE_FIX.md
+setup_opencode_deepseek.ps1
+image_hyperplane_*.png
